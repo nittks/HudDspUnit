@@ -1,11 +1,10 @@
-#ifndef DRV_EEP_H
-#define DRV_EEP_H
-
 enum{
-	DRV_EEP_MAP_COLOR_7SEG,
 	DRV_EEP_MAP_BRIGHT_7SEG,
+	DRV_EEP_MAP_BRIGHT_BARLED,
 	DRV_EEP_MAP_BRIGHT_DIM_7SEG,
+	DRV_EEP_MAP_BRIGHT_DIM_BARLED,
 	DRV_EEP_MAP_DISPCYC_7SEG,
+	DRV_EEP_MAP_DISPCYC_BARLED,
 	DRV_EEP_MAP_SUM,
 	DRV_EEP_MAP_MAX
 };
@@ -28,5 +27,3 @@ extern void initDrvEep( void );
 extern DRV_EEP_READ *getDrvEep( void );
 extern unsigned char setDrvEep( DRV_EEP_WRITE *inP );
 extern void interEepRedy( void );
-
-#endif

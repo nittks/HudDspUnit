@@ -1,5 +1,4 @@
-#ifndef APL_DATA_H
-#define APL_DATA_H
+
 
 //********************************************************************************
 // UARTé‘óºèÓïÒ
@@ -47,7 +46,7 @@ enum{
 };
 enum{
 	APL_DATA_PUSH_SW_SET,
-
+	APL_DATA_PUSH_SW_TEST,
 	APL_DATA_PUSH_SW_NUM
 };
 
@@ -61,10 +60,12 @@ typedef struct{
 // EEPROM
 //********************************************************************************
 typedef enum{
-	APL_DATA_SET_COLOR_7SEG,
 	APL_DATA_SET_BRIGHT_7SEG,
+	APL_DATA_SET_BRIGHT_BARLED,
 	APL_DATA_SET_BRIGHT_DIM_7SEG,
+	APL_DATA_SET_BRIGHT_DIM_BARLED,
 	APL_DATA_SET_DISPCYC_7SEG,
+	APL_DATA_SET_DISPCYC_BARLED,
 	APL_DATA_SET_SETTING_ITEM_MAX
 }APL_DATA_SET_SETTING_ITEM;
 
@@ -76,10 +77,12 @@ typedef enum{
 
 typedef struct{
 	APL_DATA_EEP_STATE	read;
-	unsigned char		color7seg;
 	unsigned char		bright7seg;
+	unsigned char		brightBarled;
 	unsigned char		brightDim7seg;
+	unsigned char		brightDimBarled;
 	unsigned char		dispcyc7seg;
+	unsigned char		dispcycBarled;
 }APL_DATA_EEP;
 
 
@@ -94,4 +97,3 @@ extern void setAplDataEep( APL_DATA_EEP * inData );
 extern APL_DATA_CAR *getAplDataCar(void);
 extern APL_DATA_SW *getAplDataSw(void);
 extern APL_DATA_EEP *getAplDataEep(void);
-#endif

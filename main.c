@@ -135,13 +135,13 @@ void disableTask( unsigned char taskNo )
 static void initReg(void)
 {
 	//I/Oê›íË
-	DDRB	= 0x00;	
-	DDRC	= 0x3E;
-	DDRD	= 0x05;
+	DDRB	= 0xCF;	
+	DDRC	= 0x0F;
+	DDRD	= 0xFC;
 
 	//èâä˙èoóÕílê›íË
-	PORTB	= 0x00;
-	PORTC	= 0x00;
+	PORTB	= 0xFF;
+	PORTC	= 0xFF;
 	PORTD	= 0x00;
 
 //		set_sleep_mode(SLEEP_MODE_PWR_DOWN);

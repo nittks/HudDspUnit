@@ -1,5 +1,3 @@
-#ifndef DRV_UART_H
-#define DRV_UART_H
 
 //----------------------------------------
 // ëóêM
@@ -32,5 +30,3 @@ extern void interGetUartRxData(void);
 extern void drvUartChangeTx( void );
 extern void setDrvUartTx( DRV_UART_TX *inP );
 extern DRV_UART_RX *getDrvUartRx( void );
-
-#endif

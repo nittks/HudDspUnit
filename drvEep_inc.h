@@ -1,5 +1,3 @@
-#ifndef DRV_EEP_INC_H
-#define DRV_EEP_INC_H
 
 #define	EEP_READY_FAIL		0
 
@@ -12,5 +10,3 @@ typedef enum{
 	EEP_STATE_READ,
 	EEP_STATE_WRITE
 }EEP_STATE;
-
-#endif

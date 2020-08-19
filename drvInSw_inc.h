@@ -1,14 +1,13 @@
-#ifndef DRV_IN_SW_INC_H
-#define DRV_IN_SW_INC_H
 
 #define	ROT_ENC_DEBTIME	(1)	//1周期待ち(翌周期まで待つ→10+10x1ms
 #define	PUSH_SW_DEBTIME		(60)	//デバウンス待ち時間
 #define	PUSH_SW_LONGTIME	(100)	//長押し判定時間(10x100=1000ms
 
-#define	PORT_ROT_ENC0_A		((PORTB & (1<<PD5))>> PD5)
-#define	PORT_ROT_ENC0_B		((PORTB & (1<<PD6))>> PD6)
+#define	PORT_ROT_ENC0_A		((PORTB & (1<<PB4))>> PB4)
+#define	PORT_ROT_ENC0_B		((PORTB & (1<<PB5))>> PB5)
 
-#define	PORT_PUSHSW_0		((PORTC & (1<<PD7))>> PD7)
+#define	PORT_PUSHSW_0		((PORTC & (1<<PC4))>> PC4)
+#define	PORT_PUSHSW_1		((PORTC & (1<<PC5))>> PC5)
 
 
 #define	ROT_VECT_FORWARD	((signed char)(4))
@@ -62,4 +61,7 @@ typedef enum{
 #define	SET_PCMSK1	(PCMSK1 | 0x30)
 #define	SET_PCMSK0	(PCMSK0 | 0x30)
 
-#endif
+
+
+
+
