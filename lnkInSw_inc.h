@@ -1,3 +1,5 @@
+#ifndef LNK_IN_SW_INC_H
+#define LNK_IN_SW_INC_H
 
 //”z—ñNo
 typedef enum{
@@ -9,3 +11,4 @@ typedef enum{
 	PUSH_SW_TEST,
 }PUSH_SW_NO;
 
+#endif

@@ -1,4 +1,5 @@
-
+#ifndef DRV_OUT_SHIFT_REG_INC_H
+#define DRV_OUT_SHIFT_REG_INC_H
 
 #define CNTMAX		((unsigned char)10)	//8bit
 #define CNT100MSMAX	((unsigned char)20)	//5ms割り込み20回で100ms
@@ -7,15 +8,18 @@
 //********************************************************************************
 // シフトレジスタ
 //********************************************************************************
+#define	CPLD_SEND_DATA_NUM	6
+
+
 //出力bitポジション
-#define	SRCLR_POS	5
-#define	SRCLK_POS	6
-#define	RCLK_POS	7
-#define	OE_POS		4
-#define	SER_POS		3
+#define	SRCLR_POS	3
+#define	SRCLK_POS	4
+#define	RCLK_POS	5
+#define	OE_POS		1
+#define	SER_POS		2
 
 //カソード側各ポート
-#define	SHIFT_REG_PORT	PORTD
+#define	SHIFT_REG_PORT	PORTC
 #define	SRCLR_ON	(SHIFT_REG_PORT &= ~(1<<SRCLR_POS))	//Lowアクティブ
 #define	SRCLR_OFF	(SHIFT_REG_PORT |=  (1<<SRCLR_POS))
 #define	SRCLK_ON	(SHIFT_REG_PORT |=  (1<<SRCLK_POS))
@@ -78,3 +82,4 @@
 //#define SET_ICR2		((ICR2 = REG_ICR1>>8);(ICR1L = REG_ICR1&0x0F))
 #define	SET_OCR2A( data )	(OCR2A = (((unsigned long)data*OCR2A_MAX)/100))
 
+#endif
