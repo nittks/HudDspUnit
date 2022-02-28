@@ -230,7 +230,7 @@ static void judgeErr( void )
 	
 	// 通信SUMエラー
 	if( ( inAplDataCar->rx == true ) &&
-		( inAplDataCar->sumerr = true )
+		( inAplDataCar->sumerr == true )
 	){
 		errTimer.sum++;
 		if( errTimer.sum >= ERR_TABLE.sum ){

@@ -41,9 +41,9 @@ static APL_DATA_ROT_ENC judgeRotEnc( DRV_IN_ROT_ENC_STATE rotEncState )
 
 	//ロータリーエンコーダー判定
 	if( rotEncState == DRV_IN_ROT_ENC_STATE_FORWARD ){
-		ret	= APL_DATA_ROT_ENC_UP;	
+		ret	= APL_DATA_ROT_ENC_DOWN;	
 	}else if( rotEncState == DRV_IN_ROT_ENC_STATE_REVERCE ){
-		ret	= APL_DATA_ROT_ENC_DOWN;
+		ret	= APL_DATA_ROT_ENC_UP;
 	}else{
 		ret	= APL_DATA_ROT_ENC_STOP;
 	}

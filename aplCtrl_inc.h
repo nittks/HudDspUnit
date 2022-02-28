@@ -40,8 +40,8 @@ unsigned char eepDefault[EEP_SETTING_ITEM_MAX] = {
 	 0,		//h
 	 0,		//s
 	100 ,	//v
-	60,		//7セグ輝度
-	20,		//7セグ輝度(減光
+	100,		//7セグ輝度
+	60,		//7セグ輝度(減光
 	20,		//7セグ表示更新速度
 };
 #define		INIT_PALSE_SPEED	SETTING_PALSE_SPEED_04

@@ -159,7 +159,8 @@ void aplDispDataMain( void )
 	// テストモード
 	//****************************************
 	case APL_CTRL_STATE_TESTDISP:		//テストモード
-		
+		aplDispData.mode	= APL_DISP_DATA_MODE_NORMAL;
+
 		switch( inAplCtrl->stateTest ){
 		case APL_CTRL_STATE_TEST_AUTO:
 			tmpSpeed	= makeTestDataSpeed();
@@ -175,6 +176,8 @@ void aplDispDataMain( void )
 	// 設定
 	//****************************************
 	case APL_CTRL_STATE_SETTING:		//設定
+		aplDispData.mode	= APL_DISP_DATA_MODE_NORMAL;
+		
 		//調光(減光)だけ上書き。上書き法はちょっと嫌
 		if( inAplCtrl->stateSet == APL_CTRL_STATE_SETTING_BRIGHT_DIM ){
 			aplDispData.bright7seg		= inAplCtrlSet->brightDim7seg;
@@ -195,15 +198,20 @@ void aplDispDataMain( void )
 static bool isErr( void )
 {
 	APL_CTRL_ERR_FLAG	*inAplCtrlErrFlag	= getAplCtrlErrFlag();
+	bool	ret;
 	
-	if( (inAplCtrlErrFlag->rx	== true ) ||
-		(inAplCtrlErrFlag->sum	== true )
-	){
-		return( true );
-	}else{
-		return( false );
+	ret=false;
+	if(inAplCtrlErrFlag->rx	== true ){
+		ret = true;
 	}
 	
+	if( (inAplCtrlErrFlag->rx == false) &&
+		(inAplCtrlErrFlag->sum	== true)
+	){
+		ret = true;
+	}
+	
+	return( ret );
 }
 //********************************************************************************
 // 車速表示
