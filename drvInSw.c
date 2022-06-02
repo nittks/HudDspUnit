@@ -193,6 +193,7 @@ static void inputPushSw( void )
 
 //********************************************************************************//
 // ポート変化割り込み
+// pushswも割り込み使ってないから、割り込みしなくても良いかもしれない
 //********************************************************************************//
 void interPortD( void )
 {
@@ -205,7 +206,7 @@ void interPortD( void )
 		grayCode[NO_SET]	= (((grayCode[NO_SET] << 2) | portTmp) & 0x0F);
 		chkRotateVectCnt( NO_SET );
 	}
-
+	PORTD.INTFLAGS	= PORTD.INTFLAGS & 0x03;	// 割り込み要求クリア
 
 	sei();
 }
