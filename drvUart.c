@@ -58,6 +58,7 @@ void initDrvUart( void )
 		drvUartRx.rxData[i]	= 0;
 	}
 	drvUartRx.rxDataNum =	0;
+	drvUartRx.rxFlag	=	false;
 		
 	rxDataCnt		= 0;
 	rxDataLen		= 0;
@@ -66,7 +67,7 @@ void initDrvUart( void )
 
 	//送受信許可
 	EN_UART_TX;
-//	EN_UART_RX;
+	EN_UART_RX;
 //	UCSR0B	= (1<<TXEN0);
 
 	//受信完了割込み許可
@@ -92,7 +93,7 @@ volatile	int32_t baud_reg_val = (uint16_t)USART1_BAUD_RATE(9600);
 //			 | 1 << USART_DREIE_bp /* Data Register Empty Interrupt Enable: disabled */
 //			 | 0 << USART_LBME_bp /* Loop-back Mode Enable: disabled */
 			 | USART_RS485_EXT_gc /* RS485 Mode disabled */
-			 | 0 << USART_RXCIE_bp /* Receive Complete Interrupt Enable: disabled */
+			 | 1 << USART_RXCIE_bp /* Receive Complete Interrupt Enable: enable */
 //			 | 0 << USART_RXSIE_bp /* Receiver Start Frame Interrupt Enable: disabled */
 //			 | 1 << USART_TXCIE_bp; /* Transmit Complete Interrupt Enable: disabled */
 ;
@@ -182,22 +183,17 @@ void interUartTxFin(void)
 //********************************************************************************//
 // 受信データ取得
 //********************************************************************************//
-DRV_UART_RX *getDrvUartRx( void )
+DRV_UART_RX getDrvUartRx( void )
 {
-	DRV_UART_RX*	ret;
-	
-	if( rxFlag == false ){
-		ret = NULL;
-	}else{
-		ret = &drvUartRx;
-		rxFlag = false;
-	}
-	return( ret );
+	drvUartRx.rxFlag	= rxFlag;
+	rxFlag				= false;
+
+	return( drvUartRx );
 }
 
 
 //********************************************************************************//
-// UART受信データ割り込み処理
+// UART受信データ割り込み処理	/ 割り込みの中で処理してるの良くないよね
 //********************************************************************************//
 void interGetUartRxData(void)
 {

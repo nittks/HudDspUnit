@@ -19,6 +19,7 @@ typedef struct{
 typedef struct{
 	unsigned char	rxData[DRV_UART_RX_BUF_SIZE];
 	unsigned char	rxDataNum;
+	unsigned char	rxFlag;
 }DRV_UART_RX;
 
 
@@ -31,6 +32,6 @@ extern void interSetUartTxData(void);
 extern void interGetUartRxData(void);
 extern void drvUartChangeTx( void );
 extern void setDrvUartTx( DRV_UART_TX *inP );
-extern DRV_UART_RX *getDrvUartRx( void );
+extern DRV_UART_RX getDrvUartRx( void );
 
 #endif

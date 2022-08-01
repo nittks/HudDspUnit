@@ -103,8 +103,8 @@ typedef struct{
 }ERR_TIMER;
 
 ERR_TIMER ERR_TABLE	= {
-	( 5 * 1000 / TASK_CYC_MS ),
-	( 3 * 1000 / TASK_CYC_MS )
+	( 5 * 1000 / TASK_CYC_MS ),		// 通信途絶5sec
+	( 3 * 1000 / TASK_CYC_MS )		// sumエラー3sec
 };
 
 

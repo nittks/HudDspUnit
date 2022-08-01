@@ -15,39 +15,40 @@ void initLnkInCom( void )
 //メイン処理
 void lnkInComMain( void )
 {
-	DRV_UART_RX		*inDrvUartRx;
+	DRV_UART_RX		inDrvUartRx;
 	APL_DATA_CAR	aplDataCar;
 	unsigned char	i;
 	volatile unsigned char	sum;
 	
 	inDrvUartRx = getDrvUartRx();
-	if( inDrvUartRx == NULL ){
+	if( inDrvUartRx.rxFlag == false ){
 		aplDataCar.rx		= false;
+		setAplDataCarRxFalse();			// 受信なしの時は、aplDataCarの他の値は保持し、rxだけfalseにする
 		return;
+	}else{
+		aplDataCar.rx		= true;
 	}
-
-	aplDataCar.rx		= true;
 
 	sum=0;
-	for( i=0 ; i<inDrvUartRx->rxDataNum-1 ; i++ ){
-		sum += inDrvUartRx->rxData[i];
+	for( i=0 ; i<inDrvUartRx.rxDataNum-1 ; i++ ){
+		sum += inDrvUartRx.rxData[i];
 	}
 	
-	if( sum != inDrvUartRx->rxData[inDrvUartRx->rxDataNum-1]){
+	if( sum != inDrvUartRx.rxData[inDrvUartRx.rxDataNum-1]){
 		aplDataCar.sumerr	= true;		
 	}else{
 		aplDataCar.sumerr	= false;
 
-		aplDataCar.speed	= inDrvUartRx->rxData[UART_NO_SPEED];
-		aplDataCar.rev		= (( (unsigned short)inDrvUartRx->rxData[UART_NO_REV0] << 8) |
-												 inDrvUartRx->rxData[UART_NO_REV1]);
-		aplDataCar.palseSetSpeed	= inDrvUartRx->rxData[UART_NO_PALSE_SET] & 0x0F;
-		aplDataCar.palseSetRev		= inDrvUartRx->rxData[UART_NO_PALSE_SET] >> 4;
+		aplDataCar.speed	= inDrvUartRx.rxData[UART_NO_SPEED];
+		aplDataCar.rev		= (( (unsigned short)inDrvUartRx.rxData[UART_NO_REV0] << 8) |
+												 inDrvUartRx.rxData[UART_NO_REV1]);
+		aplDataCar.palseSetSpeed	= inDrvUartRx.rxData[UART_NO_PALSE_SET] & 0x0F;
+		aplDataCar.palseSetRev		= inDrvUartRx.rxData[UART_NO_PALSE_SET] >> 4;
 
-		aplDataCar.ig	= (inDrvUartRx->rxData[UART_NO_CAR_SIG] & (1<<POS_IG )) >> POS_IG;
-		aplDataCar.acc	= (inDrvUartRx->rxData[UART_NO_CAR_SIG] & (1<<POS_ACC)) >> POS_ACC;
-		aplDataCar.ill	= (inDrvUartRx->rxData[UART_NO_CAR_SIG] & (1<<POS_ILL)) >> POS_ILL;
-		aplDataCar.vtc	= (inDrvUartRx->rxData[UART_NO_CAR_SIG] & (1<<POS_VTC)) >> POS_VTC;
+		aplDataCar.ig	= (inDrvUartRx.rxData[UART_NO_CAR_SIG] & (1<<POS_IG )) >> POS_IG;
+		aplDataCar.acc	= (inDrvUartRx.rxData[UART_NO_CAR_SIG] & (1<<POS_ACC)) >> POS_ACC;
+		aplDataCar.ill	= (inDrvUartRx.rxData[UART_NO_CAR_SIG] & (1<<POS_ILL)) >> POS_ILL;
+		aplDataCar.vtc	= (inDrvUartRx.rxData[UART_NO_CAR_SIG] & (1<<POS_VTC)) >> POS_VTC;
 		
 		
 		//範囲ブロック
