@@ -11,15 +11,20 @@
 static DRV_IN_SW		drvInSwData;		//スイッチ入力データ
 
 //内部状態
-static ROT_ENC_STATE	rotEncState[ROT_ENC_NUM];		//ロータリーエンコーダー状態
+static ROT_ENC_CNT		rotEncCnt[ROT_ENC_NUM];
 static PORT_PUSH_SW		portPushSw[PUSH_SW_NUM];
-static unsigned char	rotEncDebTimeCnt[ROT_ENC_NUM];	//デバウンス経過時間カウント
-static unsigned char	grayCode[ROT_ENC_NUM];			//ROTENC入力。前回値を保存し、今回値と合わせグレイコード化する
-static signed char		rotateVect[ROT_ENC_NUM];		//ROTENC。回転方向変化量カウント。逆方向はマイナス値のためsingedを使用
+
+volatile static	uint8_t			debugBuf255[255]={0};
+volatile static	uint8_t			debugCnt=0;
+
 
 static void chkRotateVectCnt( unsigned char portNo );
 static void inputRotEnc( void );
 static void inputPushSw( void );
+static void startDebounceTimer( void );
+static void stopDebounceTimer( void );
+
+
 //********************************************************************************//
 // 初期化
 //********************************************************************************//
@@ -30,14 +35,13 @@ void initDrvInSw( void )
 	//出力
 	for( i=0 ; i<ROT_ENC_NUM; i++ ){
 		drvInSwData.rotEncState[i]	= DRV_IN_ROT_ENC_STATE_STOP;	//入力無し
-		drvInSwData.pushSwState[i]	= DRV_IN_PUSH_SW_STATE_OFF;	//入力無し
-
-		rotEncState[i]	= ROT_ENC_STATE_WAIT;	//監視開始
-		rotEncDebTimeCnt[i]	= 0;		//デバウンス経過時間カウント
-		grayCode[i]		= 0;
-		rotateVect[i]	= 0;
+		rotEncCnt[i].rotEncState		= ROT_ENC_STATE_WAIT;	//監視開始
+		rotEncCnt[i].rotEncDebTimeCnt	= 0;		//デバウンス経過時間カウント
+		rotEncCnt[i].grayCode			= 0;
+		rotEncCnt[i].rotateVect			= 0;
 	}
 	for( i=0 ; i<PUSH_SW_NUM; i++ ){
+		drvInSwData.pushSwState[i]	= DRV_IN_PUSH_SW_STATE_OFF;	//入力無し
 		portPushSw[i].portIn		= PORT_OFF;
 		portPushSw[i].portInLatch	= PORT_OFF;
 		portPushSw[i].state			= PUSH_SW_STATE_OFF;
@@ -49,9 +53,13 @@ void initDrvInSw( void )
 	PORTD.PIN1CTRL	|= ( PORT_INVEN_bm | PORT_PULLUPEN_bm );
 	PORTD.PIN2CTRL	|= ( PORT_PULLUPEN_bm );
 	
-	//割込みレジスタ設定(
+	//割込み要求クリア(
 	PORTD.INTFLAGS	= 0x03;		//PD0-1
 
+	TCB0.CTRLA		= TCB_CLKSEL_CLKDIV2_gc;		// CLK_PER/2
+	TCB0.CTRLB		= TCB_CNTMODE_SINGLE_gc;
+	TCB0.CNT		= 0;
+	TCB0.CCMP		= ROT_ENC_DEBOUNCE_TIME_CNT;	// TOP値
 }
 
 //********************************************************************************//
@@ -83,29 +91,47 @@ static void inputRotEnc( void )
 	uint8_t	i;
 	
 	for( i=0 ; i<ROT_ENC_NUM; i++ ){
+		int8_t		rotVectCnt;
+		cli();
+		rotVectCnt	= rotEncCnt[i].rotCntFwd - rotEncCnt[i].rotCntRev;
+
+
+		if( rotVectCnt >= 1 ){
+			drvInSwData.rotEncState[i]	= DRV_IN_ROT_ENC_STATE_FORWARD;
+		}else if( rotVectCnt <= -1 ){
+			drvInSwData.rotEncState[i]	= DRV_IN_ROT_ENC_STATE_REVERCE;
+		}else{
+			drvInSwData.rotEncState[i]	= DRV_IN_ROT_ENC_STATE_STOP;
+		}
+		rotEncCnt[i].rotCntFwd	= 0;
+		rotEncCnt[i].rotCntRev	= 0;
+		sei();
+	}
+	/*
 		//正転
-		if( rotEncState[i] == ROT_ENC_STATE_FORWARD ){
-			rotEncState[i] = ROT_ENC_STATE_DEBOUNCE;
-			rotEncDebTimeCnt[i] = 0;
+		if( rotEncCnt[i].rotEncState == ROT_ENC_STATE_FORWARD ){
+			rotEncCnt[i].rotEncState = ROT_ENC_STATE_DEBOUNCE;
+			rotEncCnt[i].rotEncDebTimeCnt = 0;
 			drvInSwData.rotEncState[i]	= DRV_IN_ROT_ENC_STATE_FORWARD;
 		//逆転
-		}else if( rotEncState[i] == ROT_ENC_STATE_REVERCE ){
-			rotEncState[i] = ROT_ENC_STATE_DEBOUNCE;
-			rotEncDebTimeCnt[i] = 0;
+		}else if( rotEncCnt[i].rotEncState == ROT_ENC_STATE_REVERCE ){
+			rotEncCnt[i].rotEncState = ROT_ENC_STATE_DEBOUNCE;
+			rotEncCnt[i].rotEncDebTimeCnt = 0;
 			drvInSwData.rotEncState[i]	= DRV_IN_ROT_ENC_STATE_REVERCE;
 		//デバウンス待機
-		}else if( rotEncState[i] == ROT_ENC_STATE_DEBOUNCE ){
+		}else if( rotEncCnt[i].rotEncState == ROT_ENC_STATE_DEBOUNCE ){
 			
 			drvInSwData.rotEncState[i]	= DRV_IN_ROT_ENC_STATE_STOP;
 			//デバウンス経過
-			if( rotEncDebTimeCnt[i] >= ROT_ENC_DEBTIME ){
-				rotEncDebTimeCnt[i] = 0;
-				rotEncState[i] = ROT_ENC_STATE_WAIT;
+			if( rotEncCnt[i].rotEncDebTimeCnt >= ROT_ENC_DEBTIME ){
+				rotEncCnt[i].rotEncDebTimeCnt = 0;
+				rotEncCnt[i].rotEncState = ROT_ENC_STATE_WAIT;
 			}else{
-				rotEncDebTimeCnt[i]++;
+				rotEncCnt[i].rotEncDebTimeCnt++;
 			}
 		}
 	}
+	*/
 }
 
 //********************************************************************************//
@@ -194,19 +220,33 @@ static void inputPushSw( void )
 //********************************************************************************//
 // ポート変化割り込み
 // pushswも割り込み使ってないから、割り込みしなくても良いかもしれない
+// ->ロータリーエンコーダを早く回したときの周期が3msほどなので、割り込みしたい
+// A相B相合わせた状態の切り替わりまでの時間は0.5msほど
+// ->だるすぎると遅い
+// バタつく期間は長くて4ms。バタつき中にレベルが一定の時間は長くて0.4msほど
+// ->個々のポートに対し、チャタリングキャンセルフィルタをかける
+//   0.5ms同じレベルを継続でレベル確定。
+// ->タイマが残ってないので、500usポート割り込み停止
 //********************************************************************************//
 void interPortD( void )
 {
 	unsigned char	portTmp;		//ロータリーエンコーダー全4入力一時保存
+	uint8_t			portTmpPre	= 0;
 
 	cli();
+	PORTD.INTFLAGS	= /*PORTD.INTFLAGS &*/ 0x03;	// 割り込み要求クリア
+
+	// デバウンスタイム経過まで、ポート割り込み停止
+	PORTD.PIN0CTRL	&= ( ~PORT_INVEN_bm );
+	PORTD.PIN1CTRL	&= ( ~PORT_INVEN_bm );
+	startDebounceTimer();
+
 	portTmp	= (~PORTD.IN) & 0x03;
 
-	if( portTmp != (grayCode[NO_SET]&0x03)){	//ポート変化
-		grayCode[NO_SET]	= (((grayCode[NO_SET] << 2) | portTmp) & 0x0F);
+	if( portTmp != (rotEncCnt[NO_SET].grayCode & 0x03)){	//ポート変化
+		rotEncCnt[NO_SET].grayCode	= (((rotEncCnt[NO_SET].grayCode << 2) | portTmp) & 0x0F);
 		chkRotateVectCnt( NO_SET );
 	}
-	PORTD.INTFLAGS	= PORTD.INTFLAGS & 0x03;	// 割り込み要求クリア
 
 	sei();
 }
@@ -216,16 +256,46 @@ void interPortD( void )
 static void chkRotateVectCnt( unsigned char portNo )
 {
 	//グレイコードテーブルをもとに、回転方向変化量を加算していく
-	rotateVect[portNo]		+=grayCodeTable[ grayCode[portNo] ];
+	rotEncCnt[portNo].rotateVect		+=grayCodeTable[ rotEncCnt[portNo].grayCode ];
 
 	//変化量が4or-4で回転方向決定
-	if( rotateVect[portNo] <= ROT_VECT_FORWARD ){
-		rotEncState[portNo] = ROT_ENC_STATE_FORWARD;
-		rotateVect[portNo]	 = 0;
-	}else if( rotateVect[portNo] >= ROT_VECT_REVERCE ){
-		rotEncState[portNo] = ROT_ENC_STATE_REVERCE;
-		rotateVect[portNo]	 = 0;
+	if( rotEncCnt[portNo].rotateVect <= ROT_VECT_FORWARD ){
+		rotEncCnt[portNo].rotEncState = ROT_ENC_STATE_FORWARD;
+		rotEncCnt[portNo].rotCntFwd++;
+		rotEncCnt[portNo].rotateVect	 = 0;
+	}else if( rotEncCnt[portNo].rotateVect >= ROT_VECT_REVERCE ){
+		rotEncCnt[portNo].rotEncState = ROT_ENC_STATE_REVERCE;
+		rotEncCnt[portNo].rotCntRev++;
+		rotEncCnt[portNo].rotateVect	 = 0;
 	}
 
 }
 
+static void startDebounceTimer( void )
+{
+	TCB0.CNT		= 0;
+	TCB0.INTCTRL	= TCB_CAPT_bm;
+	TCB0.INTFLAGS	= TCB_CAPT_bm;
+
+	TCB0.CTRLA		= TCB_ENABLE_bm;
+}
+
+static void stopDebounceTimer( void )
+{
+	TCB0.CTRLA		= TCB_ENABLE_bm;
+
+	TCB0.CNT		= 0;
+	TCB0.INTCTRL	= ~TCB_CAPT_bm;
+	TCB0.INTFLAGS	= TCB_CAPT_bm;
+}
+void interDebounceTime( void )
+{
+	cli();
+
+	stopDebounceTimer();
+
+	PORTD.PIN0CTRL	|= ( PORT_INVEN_bm );
+	PORTD.PIN1CTRL	|= ( PORT_INVEN_bm );
+
+	sei();
+}

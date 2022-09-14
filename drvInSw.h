@@ -29,5 +29,6 @@ extern DRV_IN_SW *getDrvInSw( void );
 extern void drvInSwMain( void );
 extern void interSwInput( void );
 extern void interPortD( void );
+extern void interDebounceTime( void );
 
 #endif

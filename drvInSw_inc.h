@@ -53,6 +53,17 @@ typedef enum{
 }PUSH_SW_PORT_NO;
 
 #define		ROT_ENC_0_POS		(0x03)		//bit0,1より入力
+#define		ROT_ENC_DEBOUNCE_TIME_CNT	(5000)			// 500us = 500 / (1/(20MHz/2)) = 5000cnt
+
+typedef struct{
+	uint8_t		rotCntFwd;		// 正転回転数
+	uint8_t		rotCntRev;		// 逆転回転数
+
+	ROT_ENC_STATE	rotEncState;		//ロータリーエンコーダー状態
+	uint8_t			rotEncDebTimeCnt;	//デバウンス経過時間カウント
+	uint8_t			grayCode;			//ROTENC入力。前回値を保存し、今回値と合わせグレイコード化する
+	int8_t			rotateVect;			//ROTENC。回転方向変化量カウント。逆方向はマイナス値のためsingedを使用
+}ROT_ENC_CNT;
 
 typedef struct{
 	uint8_t			portIn;

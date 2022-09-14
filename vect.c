@@ -15,7 +15,13 @@ ISR(TCA0_OVF_vect)			//タイマ割り込み
 {
 	interTaskTime();
 }
-
+//*******************************
+// ロータリーエンコーダチャタリングキャンセル
+//*******************************
+ISR(TCB0_INT_vect)
+{
+	interDebounceTime();
+}
 //*******************************
 // USART1 RS-485
 //*******************************
@@ -81,9 +87,6 @@ ISR(TCA0_CMP1_vect)		{	debugVect();	}	//  _VECTOR(10)
 //ISR(TCA0_LCMP1_vect)	{	debugVect();	}	//  _VECTOR(10)
 ISR(TCA0_CMP2_vect)		{	debugVect();	}	//  _VECTOR(11)
 //ISR(TCA0_LCMP2_vect)	{	debugVect();	}	//  _VECTOR(11)
-
-/* TCB0 interrupt vectors */
-ISR(TCB0_INT_vect)		{	debugVect();	}
 
 /* TCB1 interrupt vectors */
 ISR(TCB1_INT_vect)		{	debugVect();	}
