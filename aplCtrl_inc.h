@@ -76,6 +76,7 @@ static SETTING_CONTENTS		settingContents2 [] = {
 uint8_t SETTING_PALSE_SPEED[]	= {4,8,16,20,25};			//車速パルス仕様
 uint8_t SETTING_PALSE_REV[]		= {1,2,3,4,5,6,8,10,12};	//回転数パルス仕様(気筒数
 static SETTING_CONTENTS		settingContents1 [] = {
+	// 項目名								最大値				項目タイプ	LSB	表示する値	次階層	変数		元のの値
 	{ APL_CTRL_STATE_SETTING_BRIGHT			,VOLUME_MAX			, TYPE_VAL	, 5	, NULL	, NULL	, &aplCtrlSet.bright7seg	, &aplCtrlSetBak.bright7seg		},
 	{ APL_CTRL_STATE_SETTING_BRIGHT_DIM		,VOLUME_MAX			, TYPE_VAL	, 5	, NULL	, NULL	, &aplCtrlSet.brightDim7seg , &aplCtrlSetBak.brightDim7seg	},
 	{ APL_CTRL_STATE_SETTING_COLOR			,(sizeof(settingContents2)/sizeof(SETTING_CONTENTS)-1)

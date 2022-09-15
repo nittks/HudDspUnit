@@ -25,6 +25,7 @@ void lnkInSwMain( void )
 	inDrvInSw = getDrvInSw();
 
 	//ロータリーエンコーダー判定
+	aplDataSw.rotEncMoveSetp	= inDrvInSw->rotEncMoveSetp[ROT_ENC_SET];
 	aplDataSw.rotEncSet		= judgeRotEnc( inDrvInSw->rotEncState[ROT_ENC_SET] );
 	//プッシュスイッチ判定
 	aplDataSw.pushSwSet		= judgePushSw( inDrvInSw->pushSwState[PUSH_SW_SET] );

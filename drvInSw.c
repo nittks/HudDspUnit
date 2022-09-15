@@ -1,6 +1,7 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>  //割り込みを使用するため
+#include <stdlib.h>
 
 #include "main.h"
 #include "drvInSw_inc.h"
@@ -34,7 +35,8 @@ void initDrvInSw( void )
 
 	//出力
 	for( i=0 ; i<ROT_ENC_NUM; i++ ){
-		drvInSwData.rotEncState[i]	= DRV_IN_ROT_ENC_STATE_STOP;	//入力無し
+		drvInSwData.rotEncState[i]		= DRV_IN_ROT_ENC_STATE_STOP;	//入力無し
+		drvInSwData.rotEncMoveSetp[i]	= 0;
 		rotEncCnt[i].rotEncState		= ROT_ENC_STATE_WAIT;	//監視開始
 		rotEncCnt[i].rotEncDebTimeCnt	= 0;		//デバウンス経過時間カウント
 		rotEncCnt[i].grayCode			= 0;
@@ -56,6 +58,7 @@ void initDrvInSw( void )
 	//割込み要求クリア(
 	PORTD.INTFLAGS	= 0x03;		//PD0-1
 
+	// ロータリーエンコーダチャタリングキャンセル
 	TCB0.CTRLA		= TCB_CLKSEL_CLKDIV2_gc;		// CLK_PER/2
 	TCB0.CTRLB		= TCB_CNTMODE_SINGLE_gc;
 	TCB0.CNT		= 0;
@@ -95,7 +98,7 @@ static void inputRotEnc( void )
 		cli();
 		rotVectCnt	= rotEncCnt[i].rotCntFwd - rotEncCnt[i].rotCntRev;
 
-
+		drvInSwData.rotEncMoveSetp[i]	= abs( rotVectCnt );
 		if( rotVectCnt >= 1 ){
 			drvInSwData.rotEncState[i]	= DRV_IN_ROT_ENC_STATE_FORWARD;
 		}else if( rotVectCnt <= -1 ){

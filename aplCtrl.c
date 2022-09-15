@@ -8,11 +8,6 @@
 #include "hardware.h"
 #include "aplCtrlSetting.h"
 
-#ifdef DEBUG
-uint8_t	debugDspVal		= 0;
-uint8_t	debugHierarchy	= 0;
-#endif
-
 static APL_CTRL				aplCtrl;
 static APL_CTRL_SET_PALSE	aplCtrlSetPalseBak;
 static APL_CTRL_SETTING		aplCtrlSetting;
@@ -205,8 +200,16 @@ void judgeSetting( void )
 	}
 	
 	switch( inAplDataSw->rotEncSet ){
-		case APL_DATA_ROT_ENC_UP:	aplCtrlSetting->selectUp(aplCtrlSetting);		break;
-		case APL_DATA_ROT_ENC_DOWN:	aplCtrlSetting->selectDown(aplCtrlSetting);		break;
+		case APL_DATA_ROT_ENC_UP:	
+			for( uint8_t i=0 ; i < inAplDataSw->rotEncMoveSetp ; i++ ){		// 動いたステップ数分項目を動かす。記述取りえず
+				aplCtrlSetting->selectUp(aplCtrlSetting);
+			}
+			break;
+		case APL_DATA_ROT_ENC_DOWN:
+			for( uint8_t i=0 ; i < inAplDataSw->rotEncMoveSetp ; i++ ){
+				aplCtrlSetting->selectDown(aplCtrlSetting);
+			}
+			break;
 		default:break;
 	}
 }
@@ -216,10 +219,6 @@ void procSetting( void )
 {
 	aplCtrlSet.dspVal	= aplCtrlSetting->getDspVal(aplCtrlSetting);
 	aplCtrl.stateSet	= (APL_CTRL_STATE_SET)aplCtrlSetting->getState(aplCtrlSetting);
-
-	debugDspVal			= aplCtrlSet.dspVal;
-	debugHierarchy		= aplCtrlSetting->getNowHierarchy(aplCtrlSetting);
-
 }
 
 static void judgeErr( void )

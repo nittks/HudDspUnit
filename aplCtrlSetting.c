@@ -198,7 +198,7 @@ uint8_t getDspValImpl( APL_CTRL_SETTING this )
 	if( selectItem->val == NULL ){
 		dspVal = this->itemNo;
 	}else{
-		if( selectItem->type == TYPE_ITEM ){
+		if( selectItem->itemList != NULL ){
 			dspVal = selectItem->itemList[*selectItem->val];
 		}else{
 			dspVal = *selectItem->val;		// NON‚ÆVAL‚Ì‡ê

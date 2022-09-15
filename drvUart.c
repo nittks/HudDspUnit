@@ -161,6 +161,7 @@ void interSetUartTxData(void)
 			txDataCnt = 0;
 			DI_INTER_UART_TX_REG_EMPTY;		//送信レジスタ空割込み禁止
 			EN_INTER_UART_TX_FIN;			//送信完了割込み許可
+			break;
 		}
 	}
 	sei();	//割込み許可

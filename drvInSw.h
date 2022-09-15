@@ -22,6 +22,7 @@ typedef enum{
 typedef struct{
 	DRV_IN_ROT_ENC_STATE	rotEncState[ROT_ENC_NUM];
 	DRV_IN_PUSH_SW_STATE	pushSwState[PUSH_SW_NUM];
+	uint8_t					rotEncMoveSetp[ROT_ENC_NUM];
 }DRV_IN_SW;
 
 extern void initDrvInSw( void );
