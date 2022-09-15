@@ -73,7 +73,7 @@ static SETTING_CONTENTS		settingContents2 [] = {
 																				, NULL	, NULL	}
 };
 
-uint8_t SETTING_PALSE_SPEED[]	= {4,8,16,20,25};			//車速パルス仕様
+uint8_t SETTING_PALSE_SPEED[]	= {2,4,8,16,20,25};			//車速パルス仕様
 uint8_t SETTING_PALSE_REV[]		= {1,2,3,4,5,6,8,10,12};	//回転数パルス仕様(気筒数
 static SETTING_CONTENTS		settingContents1 [] = {
 	// 項目名								最大値				項目タイプ	LSB	表示する値	次階層	変数		元のの値

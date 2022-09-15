@@ -8,7 +8,7 @@
 #include <assert.h>
 
 #include "drvUart_inc.h"
-#include "drvUart.h"
+#include "drvUart.h"	
 #include "hardware.h"
 #include "timer.h"
 
@@ -34,6 +34,7 @@ static unsigned char	rxDataLen;			//UARTフレームより取得したフレー�
 static unsigned char	rxFlag;
 
 static int8_t USART_1_init();
+static void USART_1_write(const uint8_t data);
 
 //********************************************************************************//
 // 初期化
@@ -153,7 +154,8 @@ void interSetUartTxData(void)
 	cli();	//割り込み禁止
 
 	while( UART_DATA_REG_EMP_FLG == DREIF_EMPTY ){	//送信レジスタ空の間回す
-		USART1.TXDATAH = drvUartTx.txData[txDataCnt];
+//		USART_1_write( drvUartTx.txData[txDataCnt] );
+		USART1.TXDATAL = drvUartTx.txData[txDataCnt];
 		txDataCnt++;
 
 		if( txDataCnt >= drvUartTx.txDataNum ){	//全データ送信済み
@@ -175,6 +177,7 @@ void interUartTxFin(void)
 	cli();	//割り込み禁止
 
 	uartState = UART_STATE_STANDBY;
+	DI_INTER_UART_TX_FIN;			//送信完了割込み許可
 	EN_INTER_UART_RX_COMP;			//受信完了割込み許可
 
 	sei();	//割込み許可
@@ -201,7 +204,7 @@ void interGetUartRxData(void)
 	unsigned char	rxBuf;
 	unsigned char	timerCnt;
 
-	cli();	//割り込み禁止
+	cli();	//割り込み禁止。禁止期間長くて良くなさそう
 	while( UART_REG_RXIC == RXC_IN_DATA){
 
 		//レジスタよりデータ取得
@@ -265,6 +268,12 @@ void interGetUartRxData(void)
 
 }
 
+static void USART_1_write(const uint8_t data)
+{
+	while (!(USART1.STATUS & USART_DREIF_bm))
+	;
+	USART1.TXDATAL = data;
+}
 
 //********************************************************************************//
 // UART

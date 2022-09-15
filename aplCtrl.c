@@ -253,7 +253,7 @@ static void judgeErr( void )
 // パルス仕様設定変更チェック&変更要求
 //********************************************************************************
 static void chkSetPalse( void )
-{/*
+{
 	//変更値チェック
 	if(( aplCtrlSetPalse.speed != aplCtrlSetPalseBak.speed ) ||
 	   ( aplCtrlSetPalse.rev != aplCtrlSetPalseBak.rev ))
@@ -261,7 +261,7 @@ static void chkSetPalse( void )
 		//入力ユニットへ設定値変更通信送信
 		setLnkOutCom();
 	}
-*/setLnkOutCom();
+
 }
 		
 //********************************************************************************

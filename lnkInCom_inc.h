@@ -15,10 +15,10 @@ typedef enum{
 #define	REV_MIN		((unsigned short)0)
 #define	REV_INIT	((unsigned short)2400)
 
-#define	UART_PALSE_SET_SPEED_MIN		1
+#define	UART_PALSE_SET_SPEED_MIN		0
 #define	UART_PALSE_SET_SPEED_MAX		5
 #define	UART_PALSE_SET_SPEED_DEFAULT	1
-#define	UART_PALSE_SET_REV_MIN			1
+#define	UART_PALSE_SET_REV_MIN			0
 #define	UART_PALSE_SET_REV_MAX			9
 #define	UART_PALSE_SET_REV_DEFAULT		4
 

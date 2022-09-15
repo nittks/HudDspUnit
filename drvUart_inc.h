@@ -85,7 +85,7 @@ enum{
 #define UART_ID_CARDATA			0x11		//フレームID
 
 #define DI_UART_RX						(USART1.CTRLB = USART1.CTRLB & (~USART_RXEN_bm))	//受信禁止
-#define EN_UART_RX						(USART1.CTRLB = USART1.CTRLB | (USART_RXEN_bm))	//受信許可
+#define EN_UART_RX						(USART1.CTRLB = USART1.CTRLB | (USART_RXEN_bm))		//受信許可
 #define DI_INTER_UART_RX_COMP			(USART1.CTRLA = USART1.CTRLA & (~USART_RXCIE_bm))	//受信完了割込み禁止
 #define EN_INTER_UART_RX_COMP			(USART1.CTRLA = USART1.CTRLA | (USART_RXCIE_bm))	//受信完了割込み許可
 
